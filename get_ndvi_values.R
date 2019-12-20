@@ -19,9 +19,9 @@ for(year in years_to_get){
                                   band = b,
                                   df = random_points,
                                   start=year_start,
-                                  end = year_start,
+                                  end = year_end,
                                   ncores=10)
-    output_filename = paste0('./data/ndvi/',year,'_',b)
+    output_filename = paste0('./data/ndvi/',year,'_',b,'.csv')
     write_csv(ndvi_output, output_filename)
   }
 }

@@ -4,6 +4,9 @@ library(tidyverse)
 random_points = read_csv('data/random_points.csv') %>%
   filter(percent_years_as_grass == 1)
 
+# need a site_name column for modistools
+random_points$site_name = random_points$pixel_id
+
 # MODISTools::mt_dates('MOD13Q1', lat=40, lon=-100)
 # MODISTools::mt_bands('MOD13Q1')
 

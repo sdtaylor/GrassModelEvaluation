@@ -22,19 +22,25 @@ doy_bin_info = pd.DataFrame({'doy':all_doys, 'doy_bin':doy_bins})
 #############################
 
 def filter_data(df, y, p):
+    """
+    year and pixel_id  filter
+    """
     return df[(df.year.isin(y)) & (df.pixel_id.isin(p))]
 
 def long_to_wide(df, index_column, value_column):
+    """Long to wide in the shape of (timestep, pixel_id)"""
     return df[['pixel_id',index_column,value_column]].pivot_table(index = index_column, columns='pixel_id', 
                                                                   values=value_column, dropna=False)
 
 def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag = 5):
     """
-    Load MODIS NDVI and associated predictor data (daymet preicp & temp, ET, daylength, etc)
+    Load MODIS NDVI and associated predictor data (daymet precip & temp, 
+    ET, daylength, soil)
+    
     Parameters
     ----------
     years : array of years or 'all', optional
-        whichs years to of NDVI and associated predictor 
+        whichs years of NDVI and associated predictor 
         data to return. The default is 'all'.
     pixels : array of pixel_ids or 'all', optional
         whichs pixels to return. The default is 'all'.
@@ -43,12 +49,17 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
         evap) prior to the start of NDVI values to keep.
         This allows spin up of state variables leading up to actual NDVI values 
         to fit. The default is 5.
-        NDVI for these preceding years will be NA such that the array shape
-        is consistant throughout.
+        NDVI for these preceding years will be NA. The array shape will be
+        consistant throughout all timeseries variables.
 
     Returns
     -------
-    Tuple of NDVI, {'evap': evap, 'precip':precip, ...} where everything is
+    Tuple of NDVI, {'precip': (timestep, pixel_id), # precipitation summed over the 16 day period
+                    'evap'  : (timestep, pixel_id), # ET summed over the 16 day period
+                    'Tm'    : (timestep, pixel_id), # Daily mean temp averaged over the 16 day period
+                    'Ra'    : (timestep, pixel_id), # Daily TOA radiation averaged over the 16 day period
+                    'Wcap'  : (pixel_id),           # Site specific water holding capacity
+                    'Wp'    : (pixel_id)}           # Site specific Wilting point
     a (timestep,pixel_id) array. 
 
     """
@@ -79,6 +90,8 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     assert np.isin(ndvi_data.year.unique(), years).all(), 'extra years in MODIS NDVI data'
     assert np.isin(years,ndvi_data.year.unique()).all(), 'not all years in MODIS NDVI data'
     
+    assert np.isin(daymet_data.pixel_id.unique(), pixels).all(), 'daymet data has some missing pixels'
+    assert np.isin(ndvi_data.pixel_id.unique(), pixels).all(), 'MODIS NDVI data has some missing pixels'
        
     # daily mean temperature
     daymet_data['tmean'] = (daymet_data.tmin + daymet_data.tmax) / 2
@@ -110,6 +123,7 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
                                                                                      'tmean': np.mean,
                                                                                      'tmax': np.mean,
                                                                                      'tmin': np.mean}).reset_index()
+    # Get a date column from year+doy
     daymet_data_aggregated.rename(columns={'doy_bin':'doy'}, inplace=True)
     combined_year_doy = daymet_data_aggregated.year.astype(str) + '-' + daymet_data_aggregated.doy.astype(str)
     daymet_data_aggregated['date'] = pd.to_datetime(combined_year_doy, format='%Y-%j')
@@ -123,10 +137,11 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     # Makes 1d arrays of length n_pixels, just have to make sure they're ordered
     soil_data.sort_values('pixel_id', inplace=True)
     
-    # Ensure pixel are being aligned in the arrays correctly
+    # Ensure pixel are aligned in the arrays correctly
     assert (long_to_wide(everything, index_column = 'date', value_column = 'ndvi').columns == soil_data.pixel_id).all(), 'predictor data.frame not aligning with soil data.frame'
     assert (long_to_wide(everything, index_column = 'date', value_column = 'ndvi').columns == long_to_wide(everything, index_column = 'date', value_column = 'tmean').columns).all(), 'tmean and ndvi columns not lining up'
-    # produce time x site arrays.
+    
+    # produce (timestep,pixel_id) numpy arrays.
     ndvi_array = long_to_wide(everything, index_column = 'date', value_column = 'ndvi').values
 
     predictor_vars = {}
@@ -134,6 +149,8 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     predictor_vars['evap'] = long_to_wide(everything, index_column = 'date', value_column = 'et').values
     predictor_vars['Tm'] = long_to_wide(everything, index_column = 'date', value_column = 'tmean').values
     predictor_vars['Ra'] = long_to_wide(everything, index_column = 'date', value_column = 'radiation').values
+    
+    # And site specific soil values
     predictor_vars['Wp'] = soil_data.Wp.values
     predictor_vars['Wcap'] = soil_data.Wcap.values
     

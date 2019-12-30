@@ -55,6 +55,7 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     pixel_info = pd.read_csv('data/random_points.csv')    
     ndvi_data = pd.read_csv('data/processed_ndvi.csv').drop('date', axis=1)
     daymet_data = pd.read_csv('data/daymet_data.csv')
+    soil_data = pd.read_csv('data/processed_soil_data.csv')
     
     if years == 'all':
         years = ndvi_data.year.unique()
@@ -68,7 +69,8 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     ndvi_data = filter_data(ndvi_data, years, pixels)
     predictor_years = np.append(list(range(min(years) - predictor_lag, min(years))),years)
     daymet_data = filter_data(daymet_data, predictor_years, pixels)
-
+    soil_data = soil_data[soil_data.pixel_id.isin(pixels)]
+    
     # Make sure everything is accounted for
     assert daymet_data.groupby(['year','pixel_id']).count().doy.unique()[0] == 365, 'daymet data has some years with < 365 days'
     assert np.isin(daymet_data.year.unique(), predictor_years).all(), 'extra years in daymet data'
@@ -115,8 +117,15 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     # Full outer join to combine all selected years + the preceding predictor years
     # This will make NA ndvi values for those preceding years
     everything = ndvi_data.merge(daymet_data_aggregated, how='outer', on=['year','doy','pixel_id'])
-    everything.sort_values('date', inplace=True)
-        
+    everything.sort_values(['pixel_id','date'], inplace=True)
+    
+    # Soil data is a single value/pixel, so it doesn't need combining with everything else.
+    # Makes 1d arrays of length n_pixels, just have to make sure they're ordered
+    soil_data.sort_values('pixel_id', inplace=True)
+    
+    # Ensure pixel are being aligned in the arrays correctly
+    assert (long_to_wide(everything, index_column = 'date', value_column = 'ndvi').columns == soil_data.pixel_id).all(), 'predictor data.frame not aligning with soil data.frame'
+    assert (long_to_wide(everything, index_column = 'date', value_column = 'ndvi').columns == long_to_wide(everything, index_column = 'date', value_column = 'tmean').columns).all(), 'tmean and ndvi columns not lining up'
     # produce time x site arrays.
     ndvi_array = long_to_wide(everything, index_column = 'date', value_column = 'ndvi').values
 
@@ -125,5 +134,7 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     predictor_vars['evap'] = long_to_wide(everything, index_column = 'date', value_column = 'et').values
     predictor_vars['Tm'] = long_to_wide(everything, index_column = 'date', value_column = 'tmean').values
     predictor_vars['Ra'] = long_to_wide(everything, index_column = 'date', value_column = 'radiation').values
+    predictor_vars['Wp'] = soil_data.Wp.values
+    predictor_vars['Wcap'] = soil_data.Wcap.values
     
     return ndvi_array, predictor_vars

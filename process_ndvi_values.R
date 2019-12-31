@@ -31,7 +31,11 @@ ndvi = ndvi %>%
   rename(pixel_id = site)
 
 # TODO: filter for good quality pixels only
-# source('modis_qa_stuff.R')
-# qa_info = get_mod13_qa(ndvi$qa)
+source('modis_qa_stuff.R')
+qa_info = ndvi %>%
+  select(pixel_id, year, doy, date, qa)
+
+qa_info = qa_info %>%
+  bind_cols(get_mod13_qa(qa_info$qa))
 
 write_csv(ndvi, 'data/processed_ndvi.csv')

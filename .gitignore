@@ -1,6 +1,21 @@
+# project specific stuff
+data/ndvi
+
+# R stff
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 *.Rproj
-data/ndvi
+
+# dask temp files
+dask-worker-space/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

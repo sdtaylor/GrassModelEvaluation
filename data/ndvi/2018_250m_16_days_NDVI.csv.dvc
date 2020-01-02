@@ -1,0 +1,7 @@
+md5: 92ee5c8f483658c42249e90ca7aea331
+outs:
+- md5: 5fb7c7cd4e3c95b1b32fd905c2da8d72
+  path: 2018_250m_16_days_NDVI.csv
+  cache: true
+  metric: false
+  persist: false

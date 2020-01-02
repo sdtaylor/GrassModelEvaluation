@@ -1,0 +1,7 @@
+md5: 4563abfdd747f6d5c746706013d30e67
+outs:
+- md5: b865d9ee47cb9c4b78f625a558ebedee
+  path: 2004_250m_16_days_composite_day_of_the_year.csv
+  cache: true
+  metric: false
+  persist: false

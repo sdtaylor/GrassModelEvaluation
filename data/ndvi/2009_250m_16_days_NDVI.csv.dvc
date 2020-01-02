@@ -1,0 +1,7 @@
+md5: 186879edd857db73dcda7eeb98424cef
+outs:
+- md5: 6f673ab25570772b63c85e32c166a981
+  path: 2009_250m_16_days_NDVI.csv
+  cache: true
+  metric: false
+  persist: false

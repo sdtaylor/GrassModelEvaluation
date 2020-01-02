@@ -1,0 +1,7 @@
+md5: 128c9b1ccd828708688663fd7d227201
+outs:
+- md5: 2001dd04eb15b2d8e53c149af4f3c125
+  path: random_points.csv
+  cache: true
+  metric: false
+  persist: false

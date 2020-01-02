@@ -1,0 +1,7 @@
+md5: 46196d13056b0227d8c940ce12d8d169
+outs:
+- md5: d0ad980b800e16b10ab942e9ac4181ed
+  path: 2018_250m_16_days_VI_Quality.csv
+  cache: true
+  metric: false
+  persist: false

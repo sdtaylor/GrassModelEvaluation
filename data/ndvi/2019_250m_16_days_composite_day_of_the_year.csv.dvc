@@ -1,0 +1,7 @@
+md5: 00464f44dbda6356708fe0e2633587bf
+outs:
+- md5: 0f2849e4ec7087bf6947a6e951b5e403
+  path: 2019_250m_16_days_composite_day_of_the_year.csv
+  cache: true
+  metric: false
+  persist: false

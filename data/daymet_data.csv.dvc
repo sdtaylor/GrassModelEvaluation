@@ -1,0 +1,7 @@
+md5: 6c0d9816707b050a9bad5563a79f4251
+outs:
+- md5: c0178030f4c23e3ecce93367041d694f
+  path: daymet_data.csv
+  cache: true
+  metric: false
+  persist: false

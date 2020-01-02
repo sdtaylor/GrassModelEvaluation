@@ -1,0 +1,7 @@
+md5: 043af206059d6a459899f7a3d95cf315
+outs:
+- md5: 702d3caccd784c3699c91b2c73aa0c56
+  path: random_points.geojson
+  cache: true
+  metric: false
+  persist: false

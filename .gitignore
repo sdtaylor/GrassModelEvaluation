@@ -1,6 +1,3 @@
-# project specific stuff
-data/ndvi
-
 # R stff
 .Rproj.user
 .Rhistory
@@ -10,6 +7,7 @@ data/ndvi
 
 # dask temp files
 dask-worker-space/
+slurm*
 
 # Spyder project settings
 .spyderproject

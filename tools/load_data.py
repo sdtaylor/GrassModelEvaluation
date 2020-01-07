@@ -145,13 +145,13 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     ndvi_array = long_to_wide(everything, index_column = 'date', value_column = 'ndvi').values
 
     predictor_vars = {}
-    predictor_vars['precip'] = long_to_wide(everything, index_column = 'date', value_column = 'precip').values
-    predictor_vars['evap'] = long_to_wide(everything, index_column = 'date', value_column = 'et').values
-    predictor_vars['Tm'] = long_to_wide(everything, index_column = 'date', value_column = 'tmean').values
-    predictor_vars['Ra'] = long_to_wide(everything, index_column = 'date', value_column = 'radiation').values
+    predictor_vars['precip'] = long_to_wide(everything, index_column = 'date', value_column = 'precip').values.astype(np.float32)
+    predictor_vars['evap'] = long_to_wide(everything, index_column = 'date', value_column = 'et').values.astype(np.float32)
+    predictor_vars['Tm'] = long_to_wide(everything, index_column = 'date', value_column = 'tmean').values.astype(np.float32)
+    predictor_vars['Ra'] = long_to_wide(everything, index_column = 'date', value_column = 'radiation').values.astype(np.float32)
     
     # And site specific soil values
-    predictor_vars['Wp'] = soil_data.Wp.values
-    predictor_vars['Wcap'] = soil_data.Wcap.values
+    predictor_vars['Wp'] = soil_data.Wp.values.astype(np.float32)
+    predictor_vars['Wcap'] = soil_data.Wcap.values.astype(np.float32)
     
     return ndvi_array, predictor_vars

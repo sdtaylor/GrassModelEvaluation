@@ -8,6 +8,7 @@ library(rnaturalearth)
 ###########################
 set.seed(100)
 random_point_count = 2000
+percent_training = 0.6
 
 us_states = c('Washington','Oregon','California','Montana','Idaho','Nevada',
               'Arizona','Wyoming','Colorado','Utah','New Mexico','Texas',
@@ -66,6 +67,12 @@ grass_percent =pixel_landcover %>%
 
 random_points@data = random_points@data %>%
   left_join(grass_percent, by='pixel_id')
+
+# Mark testing/training subsets
+training_pixels = 1:as.integer(random_point_count * percent_training)
+random_points@data$is_training = F
+random_points@data$is_training[training_pixels] = T
+random_points@data$is_testing = !random_points@data$is_training
 
 # save as shapefile and plain csv
 writeOGR(random_points, 'data/random_points.geojson',layer='', driver='GeoJSON')

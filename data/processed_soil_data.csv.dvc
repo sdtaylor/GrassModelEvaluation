@@ -1,0 +1,8 @@
+md5: 572eb8f73a6585fbb7ec261ee8953313
+wdir: .
+outs:
+- md5: 82fd6152cefef6c697849d81fb3956ec
+  path: processed_soil_data.csv
+  cache: true
+  metric: false
+  persist: false

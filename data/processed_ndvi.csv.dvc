@@ -1,0 +1,8 @@
+md5: db3b70c3bde7287f6cc94422717ea679
+wdir: .
+outs:
+- md5: 6493b8be5e2139ececd4df00fd071d21
+  path: processed_ndvi.csv
+  cache: true
+  metric: false
+  persist: false

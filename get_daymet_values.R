@@ -7,7 +7,7 @@ random_points = read_csv('data/random_points.csv') %>%
 get_daymet_data = function(lon,lat,pixel_id){
   print(pixel_id)
   download_output = daymetr::download_daymet(lat = lat, lon = lon,
-                                             start = 1995, end = 2018,
+                                             start = config$daymet_years_start, end = config$daymet_years_end,
                                              silent = T)
   
   df = download_output$data

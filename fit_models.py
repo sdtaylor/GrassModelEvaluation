@@ -13,6 +13,8 @@ from dask.distributed import Client, as_completed
 from dask import delayed
 import dask
 
+from tools.tools import load_config
+config = load_config()
 
 ceres_workers = 150 # the number of slurm job that will be spun up
 ceres_cores_per_worker = 1 # number of cores per job
@@ -29,10 +31,9 @@ ceres_partition        = 'short'    # short: 48 hours, 55 nodes
 pixel_info = pd.read_csv('data/random_points.csv')
 pixel_info = pixel_info[pixel_info.percent_years_as_grass == 1]
 
-# TODO: set this to the training/testing pixel column when that's hashed out
 training_pixels = pixel_info[pixel_info.is_training].pixel_id.values
 
-training_year_sets = [range(2001,2010),range(2010,2019)]
+training_year_sets = [range(year_set['start'],year_set['end']+1) for year_set in config['training_year_sets']]
 ######################################################
 # Setup dask cluster
 ######################################################

@@ -10,7 +10,7 @@ random_points$site_name = random_points$pixel_id
 # MODISTools::mt_dates('MOD13Q1', lat=40, lon=-100)
 # MODISTools::mt_bands('MOD13Q1')
 
-years_to_get = 2001:2019
+years_to_get = config$ndvi_years_start:config$ndvi_years_end
 bands_to_get = c('250m_16_days_VI_Quality','250m_16_days_NDVI','250m_16_days_composite_day_of_the_year')
 
 for(year in years_to_get){

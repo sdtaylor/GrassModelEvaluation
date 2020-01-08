@@ -3,12 +3,15 @@ library(rgdal)
 library(tidyverse)
 library(rnaturalearth)
 
+source('tools/tools.R')
+config = load_config()
+
 ###########################
 # Make a geojson of random points within the western USA 
 ###########################
 set.seed(100)
-random_point_count = 2000
-percent_training = 0.6
+random_point_count = config$random_point_count
+percent_training = config$percent_training
 
 us_states = c('Washington','Oregon','California','Montana','Idaho','Nevada',
               'Arizona','Wyoming','Colorado','Utah','New Mexico','Texas',

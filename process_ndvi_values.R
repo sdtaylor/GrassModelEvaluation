@@ -3,6 +3,9 @@ library(tidyr)
 library(readr)
 library(purrr)
 
+source('tools/tools.R')
+config = load_config()
+
 # take the raw output from MODISTools downloads and process
 # to ingest into models.
 ndvi_files = list.files('./data/ndvi/', pattern = '*csv$', full.names = T)
@@ -61,9 +64,9 @@ pixels_to_keep_min_sample_filter =  ndvi %>%
   summarise(n_dates = n_distinct(date)) %>%
   ungroup() %>%
   group_by(pixel_id) %>%
-  summarise(n_years_with_10_dates = sum(n_dates>=10)) %>%
+  summarise(n_years_with_10_dates = sum(n_dates>= config$ndvi_minimum_dates_per_year)) %>%
   ungroup() %>%
-  filter(n_years_with_10_dates==19)
+  filter(n_years_with_10_dates== config$ndvi_minimum_years_with_x_dates)
 
 ndvi = ndvi %>%
   filter(pixel_id %in% pixels_to_keep_min_sample_filter$pixel_id)

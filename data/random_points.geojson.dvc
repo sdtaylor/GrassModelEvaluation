@@ -1,7 +1,8 @@
-md5: 043af206059d6a459899f7a3d95cf315
+md5: 5dd1bcbe6e465486d9c0d1dd42dfbb8d
+wdir: ..
 outs:
-- md5: 702d3caccd784c3699c91b2c73aa0c56
-  path: random_points.geojson
+- md5: ec608b8da5b1c927defcace4781a7efb
+  path: data/random_points.geojson
   cache: true
   metric: false
   persist: false

@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-from GrasslandModels import utils, models
+import GrasslandModels
+
+from tools.load_data import get_pixel_modis_data
 
 from scipy import optimize
 from time import sleep
@@ -12,14 +14,25 @@ from dask import delayed
 import dask
 
 
-ceres_workers = 200 # the number of slurm job that will be spun up
+ceres_workers = 150 # the number of slurm job that will be spun up
 ceres_cores_per_worker = 1 # number of cores per job
-ceres_mem_per_worker   = '500MB' # memory for each job
+ceres_mem_per_worker   = '2GB' # memory for each job
 ceres_worker_walltime  = '08:00:00' # the walltime for each worker, HH:MM:SS
 ceres_partition        = 'short'    # short: 48 hours, 55 nodes
                                     # medium: 7 days, 25 nodes
                                     # long:  21 days, 15 nodes
 
+
+
+######################################################
+# Setup fitting/testing clusters
+pixel_info = pd.read_csv('data/random_points.csv')
+pixel_info = pixel_info[pixel_info.percent_years_as_grass == 1]
+
+# TODO: set this to the training/testing pixel column when that's hashed out
+training_pixels = pixel_info[pixel_info.is_training].pixel_id.values
+
+training_year_sets = [range(2001,2010),range(2010,2019)]
 ######################################################
 # Setup dask cluster
 ######################################################
@@ -38,6 +51,7 @@ while active_workers < (ceres_workers-1):
     active_workers =  len(dask_client.scheduler_info()['workers'])
 print('all workers online')
 
+# This is the callable sent to scipy.
 def dask_scipy_mapper(func, iterable, c=dask_client):
     chunked_iterable = toolz.partition_all(9, iterable)
     results = [func(x) for x in chunked_iterable]
@@ -45,46 +59,74 @@ def dask_scipy_mapper(func, iterable, c=dask_client):
     return list(toolz.concat([f.result() for f in futures]))
 
 ######################################################
-# model fitting
+# model fitting delayed(func)(x)
 ######################################################
-de_fitting_params = {'maxiter':500,
-                     'popsize':200,
+de_fitting_params = {
+                     #'maxiter':500,
+                     #'popsize':200,
+                     'maxiter':20,
+                     'popsize':2,
                      'mutation':(0.5,1),
                      'recombination':0.25,
                      'workers': dask_scipy_mapper,
                      'polish': False,
 		     #'workers':2,
                      'disp':True}
+
+# the search ranges for the model parameters
+parameter_ranges = {'CholerPR1':{'b1':(0,100),
+                                 'b2':(0,10),
+                                 'b3':(0,10),
+                                 'L' :(0,6)},
+                    'CholerPR2':{'b1':(0,100),
+                                 'b2':(0,10),
+                                 'b3':(0,10),
+                                 'b4':(0,100),
+                                 'L' :(0,6)}}
+
+
+def load_model_and_data(model_name,pixels, years):
+    ndvi, predictor_vars = get_pixel_modis_data(years = years, pixels = pixels)
     
-def load_model():
-    GCC, predictor_vars = utils.load_test_data()
-    
-    #GCC = np.repeat(GCC, 10, axis=0)
-    #for k in ['precip', 'evap', 'Tm', 'Ra']:
-    #    predictor_vars[k] = np.repeat(predictor_vars[k], 10, axis=0)
-        
-    m = models.PhenoGrass()
-    m.fitting_predictors = predictor_vars
-    m.obs_fitting = GCC
-    m._set_loss_function('mean_cvmae')
+    m = GrasslandModels.utils.load_model(model_name)(parameters = parameter_ranges[model_name])
+    this_model_predictors = {p:predictor_vars[p] for p in m.required_predictors()}
+
+    m.fit_load(ndvi, this_model_predictors, loss_function = 'mean_cvmae')
 
     return m
 
 if __name__=='__main__':
 
-    model_future = dask_client.submit(load_model)
-    local_model = model_future.result()
-    dask_client.replicate(model_future)
+    for training_years in training_year_sets:
+        for model_name in ['CholerPR1','CholerPR2']:
+            
+            # This future is the model, with fitting data, being loaded on all
+            # the nodes by replicate()
+            model_future = dask_client.submit(load_model_and_data, model_name = model_name, 
+                                              pixels = training_pixels, years = training_years)
+            dask_client.replicate(model_future)
+            
+            # Keep a local model for some scipy fitting stuff
+            local_model = model_future.result()
+            scipy_bounds = local_model._scipy_bounds()
+            
+            # A wrapper to put into the scipy optimizer, it accepts a list of candidate
+            # parameter sets to evaluate, and returns a list of scores.
+            # The delayed wrapper and the use of the model future lets it be run across all the dask distributed nodes. 
+            @delayed
+            def minimize_me(scipy_parameter_sets):
+                return [model_future.result()._scipy_error(param_set) for param_set in scipy_parameter_sets]
 
-    @delayed
-    def minimize_me(x):
-        return [model_future.result()._scipy_error(params) for params in x]
-
-    scipy_bounds = local_model._scipy_bounds()
-
-    params =  optimize.differential_evolution(minimize_me, bounds=scipy_bounds, **de_fitting_params)
-    local_model._fitted_params = local_model._translate_scipy_parameters(params['x'])
-    local_model.save_params('fitted_parameters.json', overwrite=True)
+            # This kicks off all the parallel work
+            params =  optimize.differential_evolution(minimize_me, bounds=scipy_bounds, **de_fitting_params)
+            
+            # Map the scipy results output back to model parameters and save results
+            local_model._fitted_params = local_model._translate_scipy_parameters(params['x'])
+            
+            model_filename = '{m}_{y1}{y2}.json'.format(m = model_name, y1=min(training_years), y2=max(training_years))
+            local_model.save_params('fitted_models/' + model_filename, overwrite=True)
     
-    _ = params.pop('x')
-    models.utils.misc.write_saved_model(dict(params), model_file='scipy_output.json', overwrite=True)
+            # Also write the scipy output which logs the fitting details
+            scipy_output_filename  = 'scipy_output_' + model_filename
+            _ = params.pop('x')
+            GrasslandModels.models.utils.misc.write_saved_model(dict(params), model_file='fitted_models/' + scipy_output_filename, overwrite=True)

@@ -86,7 +86,7 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     assert daymet_data.groupby(['year','pixel_id']).count().doy.unique()[0] == 365, 'daymet data has some years with < 365 days'
     assert np.isin(daymet_data.year.unique(), predictor_years).all(), 'extra years in daymet data'
     assert np.isin(predictor_years,daymet_data.year.unique()).all(), 'not all predictor years in daymet data'
-    assert ndvi_data.groupby(['year','pixel_id']).count().doy.unique()[0] == 23, 'MODIS NDVI has some years with < 23 entries'
+    assert np.all(ndvi_data.groupby(['year','pixel_id']).count().doy.unique() >= 10), 'MODIS NDVI has some years with < 10 entries'
     assert np.isin(ndvi_data.year.unique(), years).all(), 'extra years in MODIS NDVI data'
     assert np.isin(years,ndvi_data.year.unique()).all(), 'not all years in MODIS NDVI data'
     

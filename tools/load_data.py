@@ -72,11 +72,15 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
         years = ndvi_data.year.unique()
     else:
         years = np.array(years)
+        
+    available_pixels = ndvi_data.pixel_id.unique()
     if pixels == 'all':
-        pixels = ndvi_data.pixel_id.unique()
+        pixels = available_pixels
     else:
+        # Make sure selected pixels are actually available in the NDVI dataset
         pixels = np.array(pixels)
-    
+        pixels = pixels[[p in available_pixels for p in pixels]]
+        
     ndvi_data = filter_data(ndvi_data, years, pixels)
     predictor_years = np.append(list(range(min(years) - predictor_lag, min(years))),years)
     daymet_data = filter_data(daymet_data, predictor_years, pixels)

@@ -87,7 +87,7 @@ parameter_ranges = {'CholerPR1':{'b1':(0,100),
 
 
 def load_model_and_data(model_name,pixels, years):
-    ndvi, predictor_vars = get_pixel_modis_data(years = years, pixels = pixels)
+    ndvi, predictor_vars, _, _ = get_pixel_modis_data(years = years, pixels = pixels)
     
     m = GrasslandModels.utils.load_model(model_name)(parameters = parameter_ranges[model_name])
     this_model_predictors = {p:predictor_vars[p] for p in m.required_predictors()}

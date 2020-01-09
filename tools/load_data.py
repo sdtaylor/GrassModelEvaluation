@@ -32,6 +32,15 @@ def long_to_wide(df, index_column, value_column):
     return df[['pixel_id',index_column,value_column]].pivot_table(index = index_column, columns='pixel_id', 
                                                                   values=value_column, dropna=False)
 
+def marry_array_with_metadata(a, site_columns, date_rows, new_variable_colname):
+    """
+    Take the basic numpy array output from GrasslandModels and combine it with dates
+    and pixel_ids. Designed to work with output from get_pixel_modis_data()
+    """
+    assert a.shape == (len(date_rows), len(site_columns)), 'array shape does not match new row/col shapes'
+    df = pd.DataFrame(a,index = date_rows, columns=site_columns).reset_index()
+    return df.melt(id_vars='date', value_name = new_variable_colname)
+
 def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag = 5):
     """
     Load MODIS NDVI and associated predictor data (daymet precip & temp, 
@@ -146,7 +155,8 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     assert (long_to_wide(everything, index_column = 'date', value_column = 'ndvi').columns == long_to_wide(everything, index_column = 'date', value_column = 'tmean').columns).all(), 'tmean and ndvi columns not lining up'
     
     # produce (timestep,pixel_id) numpy arrays.
-    ndvi_array = long_to_wide(everything, index_column = 'date', value_column = 'ndvi').values
+    ndvi_pivoted = long_to_wide(everything, index_column = 'date', value_column = 'ndvi')
+    ndvi_array = ndvi_pivoted.values
 
     predictor_vars = {}
     predictor_vars['precip'] = long_to_wide(everything, index_column = 'date', value_column = 'precip').values.astype(np.float32)
@@ -158,4 +168,10 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     predictor_vars['Wp'] = soil_data.Wp.values.astype(np.float32)
     predictor_vars['Wcap'] = soil_data.Wcap.values.astype(np.float32)
     
-    return ndvi_array, predictor_vars
+    # Also return the pixel_id (columns) and date (rows) indexes so the arrays
+    # can be put back together later
+    site_columns = ndvi_pivoted.columns
+    date_rows = ndvi_pivoted.index
+    
+    
+    return ndvi_array, predictor_vars, site_columns, date_rows

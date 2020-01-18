@@ -89,7 +89,7 @@ parameter_ranges = {'CholerPR1':{'b1':(0,200),
                                  'b3':(0,10),
                                  'b4':(0,200),
                                  'L' :(0,6)},
-                    'PhenograssNDVI':{'b1': -1, # b1 is a not actually used in phenograss at the moment, 
+                    'PhenoGrassNDVI':{'b1': -1, # b1 is a not actually used in phenograss at the moment, 
                                                 # see https://github.com/sdtaylor/GrasslandModels/issues/2
                                                 # Setting to -1 makes it so the optimization doesn't waste time on b1
                                       'b2': (0,100), 
@@ -119,7 +119,7 @@ def load_model_and_data(model_name,pixels, years):
 if __name__=='__main__':
 
     for training_years in training_year_sets:
-        for model_name in ['CholerPR1','CholerPR2','CholerPR3','PhenograssNDVI','Naive']:
+        for model_name in ['CholerPR1','CholerPR2','CholerPR3','PhenoGrassNDVI','Naive']:
             
             # This future is the model, with fitting data, being loaded on all
             # the nodes by replicate()
@@ -143,6 +143,7 @@ if __name__=='__main__':
             
             # Map the scipy results output back to model parameters and save results
             local_model._fitted_params = local_model._translate_scipy_parameters(params['x'])
+            local_model._fitted_params.update(local_model._fixed_parameters)
             
             model_filename = '{m}_{y1}{y2}.json'.format(m = model_name, y1=min(training_years), y2=max(training_years))
             local_model.save_params('fitted_models/' + model_filename, overwrite=True)

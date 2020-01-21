@@ -16,12 +16,12 @@ all_ndvi_values = pd.DataFrame()
 
 tots_pixels = len(pixel_info)
 
-for i, pixel in pixel_info.reset_index().iterrows():
-    for ndvi_file_i, ndvi_file in enumerate(file_list):
+for ndvi_file_i, ndvi_file in enumerate(file_list):
+    ndvi_obj = xr.open_dataset(ndvi_file)
+    ndvi_obj.load()
+        
+    for i, pixel in pixel_info.reset_index().iterrows():
         print('pixel {n}/{N}, ndvi year {y}/{Y}'.format(n=i, N=tots_pixels, y=ndvi_file_i, Y=len(file_list)))
-
-        ndvi_obj = xr.open_dataset(ndvi_file)
-        ndvi_obj.load()
 
         ndvi_subset = ndvi_obj.sel(x=pixel['lon'], y=pixel['lat'], method='nearest')
         ndvi_subset = ndvi_subset.to_dataframe().reset_index()[['time','NDVI']]

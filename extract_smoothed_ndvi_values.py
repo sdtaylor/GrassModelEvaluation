@@ -17,15 +17,14 @@ all_ndvi_values = pd.DataFrame()
 tots_pixels = len(pixel_info)
 
 for i, pixel in pixel_info.reset_index().iterrows():
-    for f in file_list:
-        ndvi_obj = xr.open_dataset(f)
+    for ndvi_file_i, ndvi_file in enumerate(file_list):
+        print('pixel {n}/{N}, ndvi year {y}/{Y}'.format(n=i, N=tots_pixels, y=ndvi_file_i, Y=len(file_list)))
+
+        ndvi_obj = xr.open_dataset(ndvi_file)
         ndvi_obj.load()
-        
-        print('pixel {n}/{N}'.format(n=i, N=tots_pixels))
+
         ndvi_subset = ndvi_obj.sel(x=pixel['lon'], y=pixel['lat'], method='nearest')
-        
         ndvi_subset = ndvi_subset.to_dataframe().reset_index()[['time','NDVI']]
-    
         ndvi_subset.rename(columns = {'NDVI':'ndvi', 'time':'date'}, inplace=True)
         
         # The date represents the midpoint of the 8 day time period, add 3 days so

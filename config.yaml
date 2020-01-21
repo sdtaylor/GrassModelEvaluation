@@ -11,6 +11,7 @@ tmp_folder: tmp/
 random_point_count: 2000
 percent_training: 0.6
 
+random_point_file: random_points.csv
 
 # Years of daymet data to download
 daymet_years_start: 1995
@@ -29,7 +30,9 @@ ndvi_minimum_years_with_x_dates: 19
 training_year_sets:
     - start: 2001
       end: 2009
-#    - start: 2010
-#      end: 2018
+    - start: 2010
+      end: 2018
 
 full_model_predictions_file: full_model_predictions.csv
+
+smoothed_ndvi_folder: smoothed_ndvi/

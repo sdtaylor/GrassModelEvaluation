@@ -8,12 +8,15 @@ from GrasslandModels import et_utils
 # Create bins to make averages/summations of climatic data at the 16 day
 # scale of modis data
 #############################
-modis_doys = np.array([1,17,33,49,65,81,97,113,129,145,161,177,193,209,225,241,257,273,289,305,321,337,353])
+modis_doys = np.array([8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136,144,152,
+                       160,168,176,184,192,200,208,216,224,232,240,248,256,264,272,280,
+                       288,296,304,312,320,328,336,344,352,360])
+
 all_doys = list(range(1,366))
 doy_bins = []
 for d in all_doys:
-    if d > 353:
-        this_bin = 1 # days at the end of the year get aggregated to doy 1 of the next year
+    if d > modis_doys[-1]:
+        this_bin = modis_doys[0] # days at the end of the year get aggregated to the first timestep of next year
     else:
         this_bin = modis_doys[modis_doys>=d].min()
     doy_bins.append(this_bin)
@@ -41,7 +44,7 @@ def marry_array_with_metadata(a, site_columns, date_rows, new_variable_colname):
     df = pd.DataFrame(a,index = date_rows, columns=site_columns).reset_index()
     return df.melt(id_vars='date', value_name = new_variable_colname)
 
-def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag = 5):
+def get_pixel_modis_data(years = range(2000,2016), pixels = 'all', predictor_lag = 5):
     """
     Load MODIS NDVI and associated predictor data (daymet precip & temp, 
     ET, daylength, soil)
@@ -74,6 +77,10 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     """
     pixel_info = pd.read_csv('data/random_points.csv')    
     ndvi_data = pd.read_csv('data/processed_ndvi.csv').drop('date', axis=1)
+    # Years got doubled up somehow. 
+    # TODO: Look into that
+    ndvi_data = ndvi_data.drop_duplicates()
+    
     daymet_data = pd.read_csv('data/daymet_data.csv')
     soil_data = pd.read_csv('data/processed_soil_data.csv')
     
@@ -99,7 +106,7 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
     assert daymet_data.groupby(['year','pixel_id']).count().doy.unique()[0] == 365, 'daymet data has some years with < 365 days'
     assert np.isin(daymet_data.year.unique(), predictor_years).all(), 'extra years in daymet data'
     assert np.isin(predictor_years,daymet_data.year.unique()).all(), 'not all predictor years in daymet data'
-    assert np.all(ndvi_data.groupby(['year','pixel_id']).count().doy.unique() >= 10), 'MODIS NDVI has some years with < 10 entries'
+    assert np.all(ndvi_data.groupby(['year','pixel_id']).count().doy.unique() >= 45), 'MODIS NDVI has some years with < 45 entries'
     assert np.isin(ndvi_data.year.unique(), years).all(), 'extra years in MODIS NDVI data'
     assert np.isin(years,ndvi_data.year.unique()).all(), 'not all years in MODIS NDVI data'
     
@@ -122,10 +129,10 @@ def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag
                                          et_rad = daymet_data.radiation.values)
 
 
-    # Aggregate everything to the 16 day modis scale. Not fluxes are sums
-    # First assign end of year data to the NDVI values for doy=1 of the *next* year
+    # Aggregate everything to the 16 day modis scale. Note that fluxes get summed. 
+    # First assign end of year data to the NDVI values for the 1st timestep of the *next* year
     year_plus1 = daymet_data.year + 1
-    assign_to_next_year = daymet_data.doy > 353
+    assign_to_next_year = daymet_data.doy > modis_doys[-1]
     daymet_data = daymet_data.merge(doy_bin_info, how='left', on='doy')
     daymet_data.loc[assign_to_next_year, 'year'] = year_plus1[assign_to_next_year]
     

@@ -22,16 +22,18 @@ ndvi_years_end:   2019
 
 # MODIS NDVI Filtering scheme. 
 # Only keep pixels with at least this many dates/year in 19 years
+# Note these are only used for the raw modis data downloaded from ORNL
+# they don't apply to the smoothed data
 ndvi_minimum_dates_per_year: 10
 ndvi_minimum_years_with_x_dates: 19
 
 
 # Model fitting stuff
 training_year_sets:
-    - start: 2001
-      end: 2009
-    - start: 2010
-      end: 2018
+    - start: 2000
+      end: 2008
+    - start: 2009
+      end: 2016
 
 full_model_predictions_file: full_model_predictions.csv
 

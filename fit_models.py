@@ -19,8 +19,8 @@ config = load_config()
 ceres_workers = 140 # the number of slurm job that will be spun up
 ceres_cores_per_worker = 1 # number of cores per job
 ceres_mem_per_worker   = '2GB' # memory for each job
-ceres_worker_walltime  = '144:00:00' # the walltime for each worker, HH:MM:SS
-ceres_partition        = 'medium'    # short: 48 hours, 55 nodes
+ceres_worker_walltime  = '48:00:00' # the walltime for each worker, HH:MM:SS
+ceres_partition        = 'short'    # short: 48 hours, 55 nodes
                                     # medium: 7 days, 25 nodes
                                     # long:  21 days, 15 nodes
 
@@ -78,17 +78,17 @@ de_fitting_params = {
 parameter_ranges = {'CholerPR1':{'b1':(0,200),
                                  'b2':(0,10),
                                  'b3':(0,10),
-                                 'L' :(0,6)},
+                                 'L' :(0,8)},
                     'CholerPR2':{'b1':(0,200),
                                  'b2':(0,10),
                                  'b3':(0,10),
                                  'b4':(0,200),
-                                 'L' :(0,6)},
+                                 'L' :(0,8)},
                     'CholerPR3':{'b1':(0,200),
                                  'b2':(0,10),
                                  'b3':(0,10),
                                  'b4':(0,200),
-                                 'L' :(0,6)},
+                                 'L' :(0,8)},
                     'PhenoGrassNDVI':{'b1': -1, # b1 is a not actually used in phenograss at the moment, 
                                                 # see https://github.com/sdtaylor/GrasslandModels/issues/2
                                                 # Setting to -1 makes it so the optimization doesn't waste time on b1
@@ -98,10 +98,10 @@ parameter_ranges = {'CholerPR1':{'b1':(0,200),
                                       'Phmax': (1,50),
                                       'Phmin': (1,50),
                                       'Topt': (0,45), 
-                                      'L': (0,6)},
+                                      'L': (0,8)},
                     'Naive' : {'b1':(0,100),
                                'b2':(0,100),
-                               'L': (0,6)}
+                               'L': (0,8)}
                     }
 
 optimal_nodes = {model:len(params)*200/10 for model, params in parameter_ranges.items()}
@@ -119,7 +119,7 @@ def load_model_and_data(model_name,pixels, years):
 if __name__=='__main__':
 
     for training_years in training_year_sets:
-        for model_name in ['CholerPR1','CholerPR2','CholerPR3','PhenoGrassNDVI','Naive']:
+        for model_name in ['Naive','CholerPR1','CholerPR2','CholerPR3','PhenoGrassNDVI']:
             
             # This future is the model, with fitting data, being loaded on all
             # the nodes by replicate()

@@ -1,7 +1,6 @@
-md5: db3b70c3bde7287f6cc94422717ea679
-wdir: .
+md5: 849ada151d5d00e5654875de05096138
 outs:
-- md5: 6493b8be5e2139ececd4df00fd071d21
+- md5: f009dccffae6ba3e7f24bc8da6ade87d
   path: processed_ndvi.csv
   cache: true
   metric: false

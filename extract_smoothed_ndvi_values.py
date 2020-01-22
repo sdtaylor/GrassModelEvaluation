@@ -18,8 +18,7 @@ tots_pixels = len(pixel_info)
 
 for ndvi_file_i, ndvi_file in enumerate(file_list):
     ndvi_obj = xr.open_dataset(ndvi_file)
-    ndvi_obj.load()
-        
+
     for i, pixel in pixel_info.reset_index().iterrows():
         print('pixel {n}/{N}, ndvi year {y}/{Y}'.format(n=i, N=tots_pixels, y=ndvi_file_i, Y=len(file_list)))
 

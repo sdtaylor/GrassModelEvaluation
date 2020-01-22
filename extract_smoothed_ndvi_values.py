@@ -10,7 +10,6 @@ config = load_config()
 pixel_info = pd.read_csv(config['random_point_file'])
 pixel_info = pixel_info[pixel_info.percent_years_as_grass == 1]
 
-pixel_info = pixel_info.sample(100)
 latlon_crs = Proj(init='epsg:4326')
 
 file_list = glob(config['smoothed_ndvi_folder'] + '*.nc4')

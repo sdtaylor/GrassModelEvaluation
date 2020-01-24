@@ -11,7 +11,7 @@ def make_folder(f):
         
 def load_config(data_folder=None):
     with open('config.yaml', 'r') as f:
-        config = yaml.load(f)
+        config = yaml.full_load(f)
 
     if data_folder is None:
         hostname = platform.node()

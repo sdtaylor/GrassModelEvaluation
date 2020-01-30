@@ -38,52 +38,81 @@ ndvi = ndvi %>%
          doy = lubridate::yday(date)) %>%
   rename(pixel_id = site)
 
-# TODO: filter for good quality pixels only
+####################################################
+# Apply smoothing weights according to pixel quality
 source('modis_qa_stuff.R')
+
+quality_weights = tribble(
+  ~vi_quality,                                          ~w,
+  'VI Produced with good quality',                       1.0,
+  'VI produced, but check other QA',                     0.5,
+  'Pixel produced, but most probably cloudy',            0.1,
+  'Pixel not produced due to other reasons than clouds', 0.1
+  )
+
+
 qa_info = ndvi %>%
   select(pixel_id, year, doy, date, qa)
 
 qa_info = qa_info %>%
-  bind_cols(get_mod13_qa(qa_info$qa))
-
-#######################
-# Keep only observations with the highest quality
-pixels_to_keep_vi_filter = qa_info %>%
-  filter(vi_quality == 'VI Produced with good quality') %>%
-  select(pixel_id, date)
+  bind_cols(get_mod13_qa(qa_info$qa)) %>%
+  select(pixel_id, date, vi_quality) %>%
+  left_join(quality_weights, by='vi_quality')
 
 ndvi = ndvi %>%
-  filter(interaction(pixel_id, date) %in% with(pixels_to_keep_vi_filter, interaction(pixel_id, date)))
+  left_join(qa_info, by=c('pixel_id','date'))
+################################################
 
-#######################
-# Keep only pixels with >= 10 observations in all years
-# ie. drop the pixel entirely if it doesn't have this robust timeseries
-#  See https://github.com/sdtaylor/GrassModelEvaluation/issues/2
-pixels_to_keep_min_sample_filter =  ndvi %>%
-  group_by(pixel_id, year) %>%
-  summarise(n_dates = n_distinct(date)) %>%
-  ungroup() %>%
+smooth_ndvi = function(df, window_wize = 5, iters=10){
+  fit = phenofit::wSG(y = df$ndvi, w = df$w, nptperyear = 23, frame=window_wize, iters=iters)
+  df$smoothed_ndvi = fit$zs$ziter10
+  return(df)
+}
+
+ndvi = ndvi %>%
   group_by(pixel_id) %>%
-  summarise(n_years_with_10_dates = sum(n_dates>= config$ndvi_minimum_dates_per_year)) %>%
+  do(smooth_ndvi(df=.)) %>%
   ungroup() %>%
-  filter(n_years_with_10_dates== config$ndvi_minimum_years_with_x_dates)
+  rename(raw_ndvi = ndvi)
 
-ndvi = ndvi %>%
-  filter(pixel_id %in% pixels_to_keep_min_sample_filter$pixel_id)
 
-#####################
+# Plotting the smoothed timeseries with original NDVI values and qual flags
+# ndvi2 %>%
+#   filter(pixel_id %in% c(1674,1034,826,1989)) %>%
+# ggplot(aes(x= date)) +
+#   geom_line(aes(y=raw_ndvi), color='black') +
+#   geom_point(aes(y=raw_ndvi, color=vi_quality), size=3) +
+#   geom_line(aes(y=smoothed_ndvi), color='red') +
+#   geom_point(aes(y=smoothed_ndvi), color='red') +
+#   geom_line(aes(y=smoothed_scaled_ndvi), color='limegreen', size=2) +
+#   geom_hline(yintercept = 0, linetype='dotted', size=1) + 
+#   scale_x_date(date_breaks = '1 year', limits = lubridate::ymd(c('2003-01-01','2015-12-31'))) +
+#   scale_color_brewer(palette = 'Dark2') +
+#   theme(panel.grid.minor.x = element_blank()) +
+#   facet_wrap(~pixel_id, ncol=1)
+####################################################
 # Scaling to 0-1 range for models, using a global maximum and
 # pixel specific minimum. See https://github.com/sdtaylor/GrassModelEvaluation/issues/1
-absolute_max_ndvi = max(ndvi$ndvi)
+winter_months = c(12,1,2)
 
-pixel_absolute_low = ndvi %>%
+absolute_max_ndvi = max(ndvi$smoothed_ndvi)
+
+pixel_average_winter_low = ndvi %>%
+  mutate(month = lubridate::month(date)) %>%
+  filter(month %in% winter_months) %>%
   group_by(pixel_id) %>%
-  summarise(pixel_abs_low = min(ndvi)) %>%
+  summarise(pixel_avg_low = mean(smoothed_ndvi)) %>%
   ungroup()
 
 ndvi = ndvi %>%
-  left_join(pixel_absolute_low, by='pixel_id') %>%
-  mutate(ndvi = (ndvi - pixel_abs_low) / (absolute_max_ndvi - pixel_abs_low)) %>%
-  select(-pixel_abs_low, -qa)
+  left_join(pixel_average_winter_low, by='pixel_id') %>%
+  mutate(smoothed_scaled_ndvi = (smoothed_ndvi - pixel_avg_low) / (absolute_max_ndvi - pixel_avg_low)) %>%
+  mutate(smoothed_scaled_ndvi = ifelse(smoothed_scaled_ndvi <0, 0, smoothed_scaled_ndvi)) %>%
+  select(-pixel_avg_low, -qa)
+
+ndvi = ndvi %>%
+  filter(pixel_id != 214) # This one has issues
+
+ndvi$ndvi = ndvi$smoothed_scaled_ndvi
 
 write_csv(ndvi, 'data/processed_ndvi.csv')

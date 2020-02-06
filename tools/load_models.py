@@ -56,7 +56,9 @@ def load_model_set(model_set_id, folder='./fitted_models/', model_metdata_filena
     
     # Load the models
     saved_model_file_folder = folder + selected_set['model_set_folder']
-    selected_set['models'] = [load_save_model(saved_model_file_folder + f) for f in selected_set['model_filenames']]
+    selected_set['models'] = [load_saved_model(saved_model_file_folder + f) for f in selected_set['model_filenames']]
+
+    return selected_set
     
     
 def save_model_set(model_set, folder='./fitted_models/', model_metdata_filename = 'model_sets.json'): 

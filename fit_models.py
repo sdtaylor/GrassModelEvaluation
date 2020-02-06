@@ -3,6 +3,7 @@ import numpy as np
 import GrasslandModels
 
 from tools.load_data import get_pixel_modis_data
+from tools import load_models
 
 from scipy import optimize
 from time import sleep
@@ -117,8 +118,9 @@ def load_model_and_data(model_name,pixels, years):
     return m
 
 if __name__=='__main__':
-
-    for training_years in training_year_sets:
+    fit_models = []
+    
+    for training_years in training_year_sets[0:1]:
         for model_name in ['Naive','CholerPR1','CholerPR2','CholerPR3','PhenoGrassNDVI']:
             
             # This future is the model, with fitting data, being loaded on all
@@ -139,16 +141,22 @@ if __name__=='__main__':
                 return [model_future.result()._scipy_error(param_set) for param_set in scipy_parameter_sets]
 
             # This kicks off all the parallel work
-            params =  optimize.differential_evolution(minimize_me, bounds=scipy_bounds, **de_fitting_params)
+            scipy_output =  optimize.differential_evolution(minimize_me, bounds=scipy_bounds, **de_fitting_params)
             
             # Map the scipy results output back to model parameters and save results
-            local_model._fitted_params = local_model._translate_scipy_parameters(params['x'])
+            local_model._fitted_params = local_model._translate_scipy_parameters(scipy_output['x'])
             local_model._fitted_params.update(local_model._fixed_parameters)
             
-            model_filename = '{m}_{y1}{y2}.json'.format(m = model_name, y1=min(training_years), y2=max(training_years))
-            local_model.save_params('fitted_models/' + model_filename, overwrite=True)
+            # And save model input and optimize output inside the model metdata
+            _ = scipy_output.pop('x')
+            fitting_info = {'method'           : 'DE',
+                            'input_parameters' : de_fitting_params,
+                            'optimize_output'  : dict(scipy_output)}
+            local_model.update_metdata(fitting_info = fitting_info)
+
+            fit_models.append(local_model)
     
-            # Also write the scipy output which logs the fitting details
-            scipy_output_filename  = 'scipy_output_' + model_filename
-            _ = params.pop('x')
-            GrasslandModels.models.utils.misc.write_saved_model(dict(params), model_file='fitted_models/' + scipy_output_filename, overwrite=True)
+    
+    # compile all the models into a set and save
+    model_set = load_models.make_model_set(fit_models, note='test set in ceres')
+    load_models.save_model_set(model_set)

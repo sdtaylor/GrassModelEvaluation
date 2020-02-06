@@ -1,0 +1,13 @@
+{
+    "model_name": "Naive",
+    "parameters": {
+        "b1": 0.2634086948359169,
+        "b2": 0.0004853631623404908,
+        "L": 3.421655421964227
+    },
+    "metadata": {
+        "note": "fitting on all data after dropping scaling (but keeping custom smoothing)",
+        "fit_date": "2020-02-05",
+        "loss_method": "rmse"
+    }
+}

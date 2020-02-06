@@ -1,0 +1,18 @@
+{
+    "model_name": "PhenoGrassNDVI",
+    "parameters": {
+        "b1": -1,
+        "b2": 0.001167123263073222,
+        "b3": 0.013580537882909027,
+        "b4": 23.66352068128418,
+        "Phmax": 10.966488242219562,
+        "Phmin": 8.778493606499495,
+        "Topt": 34.425329992474204,
+        "L": 0.9304119538399007
+    },
+    "metadata": {
+        "note": "fitting on all data after dropping scaling (but keeping custom smoothing)",
+        "fit_date": "2020-02-05",
+        "loss_method": "rmse"
+    }
+}

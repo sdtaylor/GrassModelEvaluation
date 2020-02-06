@@ -1,0 +1,22 @@
+[
+    {
+        "model_names": [
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3",
+            "Naive",
+            "PhenoGrassNDVI"
+        ],
+        "model_filenames": [
+            "CholerPR1-ab20104adbc448f7.json",
+            "CholerPR2-ab20104adbc448f7.json",
+            "CholerPR3-ab20104adbc448f7.json",
+            "Naive-ab20104adbc448f7.json",
+            "PhenoGrassNDVI-ab20104adbc448f7.json"
+        ],
+        "model_set_folder": "2020-02-06_ab20104adbc448f7/",
+        "fit_datetime": "2020-02-06 10:50:55",
+        "model_set_id": "ab20104adbc448f7",
+        "note": "Fit using rmse as the loss function, and with the custom smoothed, though unscaled, ndvi"
+    }
+]

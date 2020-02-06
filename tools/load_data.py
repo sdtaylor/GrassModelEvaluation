@@ -8,9 +8,7 @@ from GrasslandModels import et_utils
 # Create bins to make averages/summations of climatic data at the 16 day
 # scale of modis data
 #############################
-modis_doys = np.array([8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136,144,152,
-                       160,168,176,184,192,200,208,216,224,232,240,248,256,264,272,280,
-                       288,296,304,312,320,328,336,344,352,360])
+modis_doys = np.array([1,17,33,49,65,81,97,113,129,145,161,177,193,209,225,241,257,273,289,305,321,337,353])
 
 all_doys = list(range(1,366))
 doy_bins = []
@@ -44,7 +42,7 @@ def marry_array_with_metadata(a, site_columns, date_rows, new_variable_colname):
     df = pd.DataFrame(a,index = date_rows, columns=site_columns).reset_index()
     return df.melt(id_vars='date', value_name = new_variable_colname)
 
-def get_pixel_modis_data(years = range(2000,2016), pixels = 'all', predictor_lag = 5):
+def get_pixel_modis_data(years = range(2001,2019), pixels = 'all', predictor_lag = 5):
     """
     Load MODIS NDVI and associated predictor data (daymet precip & temp, 
     ET, daylength, soil)
@@ -106,7 +104,7 @@ def get_pixel_modis_data(years = range(2000,2016), pixels = 'all', predictor_lag
     assert daymet_data.groupby(['year','pixel_id']).count().doy.unique()[0] == 365, 'daymet data has some years with < 365 days'
     assert np.isin(daymet_data.year.unique(), predictor_years).all(), 'extra years in daymet data'
     assert np.isin(predictor_years,daymet_data.year.unique()).all(), 'not all predictor years in daymet data'
-    assert np.all(ndvi_data.groupby(['year','pixel_id']).count().doy.unique() >= 45), 'MODIS NDVI has some years with < 45 entries'
+    assert np.all(ndvi_data.groupby(['year','pixel_id']).count().doy.unique() >= 23), 'MODIS NDVI has some years with < 45 entries'
     assert np.isin(ndvi_data.year.unique(), years).all(), 'extra years in MODIS NDVI data'
     assert np.isin(years,ndvi_data.year.unique()).all(), 'not all years in MODIS NDVI data'
     

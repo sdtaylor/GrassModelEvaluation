@@ -1,0 +1,15 @@
+{
+    "model_name": "CholerPR3",
+    "parameters": {
+        "b1": 120.28638960917894,
+        "b2": 8.403189469508021e-05,
+        "b3": 0.044512488853370336,
+        "b4": 0.16080773646582713,
+        "L": 0.558459385668665
+    },
+    "metadata": {
+        "note": "fitting on all data after dropping scaling (but keeping custom smoothing)",
+        "fit_date": "2020-02-05",
+        "loss_method": "rmse"
+    }
+}

@@ -63,11 +63,13 @@ def dask_scipy_mapper(func, iterable, c=dask_client):
 ######################################################
 # model fitting delayed(func)(x)
 ######################################################
+loss_function = 'mean_cvmae'
+
 de_fitting_params = {
                      #'maxiter':500,
                      #'popsize':200,
-                     'maxiter':20,
-                     'popsize':2,
+                     'maxiter':3,
+                     'popsize':20,
                      'mutation':(0.5,1),
                      'recombination':0.25,
                      'workers': dask_scipy_mapper,
@@ -113,7 +115,7 @@ def load_model_and_data(model_name,pixels, years):
     m = GrasslandModels.utils.load_model(model_name)(parameters = parameter_ranges[model_name])
     this_model_predictors = {p:predictor_vars[p] for p in m.required_predictors()}
 
-    m.fit_load(ndvi, this_model_predictors, loss_function = 'mean_cvmae')
+    m.fit_load(ndvi, this_model_predictors, loss_function = loss_function)
 
     return m
 
@@ -150,9 +152,10 @@ if __name__=='__main__':
             # And save model input and optimize output inside the model metdata
             _ = scipy_output.pop('x')
             fitting_info = {'method'           : 'DE',
-                            'input_parameters' : de_fitting_params,
+                            #'input_parameters' : de_fitting_params, # dont use this if there is a function for the workers arg
+                            'loss_function'    : loss_function,
                             'optimize_output'  : dict(scipy_output)}
-            local_model.update_metdata(fitting_info = fitting_info)
+            local_model.update_metadata(fitting_info = fitting_info)
 
             fit_models.append(local_model)
     

@@ -1,0 +1,20 @@
+{
+    "model_name": "Naive",
+    "parameters": {
+        "b1": 0.033919448894955906,
+        "b2": 0.0013347759146853377,
+        "L": 3.3092696078827184
+    },
+    "metadata": {
+        "fitting_info": {
+            "method": "DE",
+            "optimize_output": {
+                "fun": 0.06676114120885566,
+                "nfev": 48600,
+                "nit": 80,
+                "message": "Optimization terminated successfully.",
+                "success": true
+            }
+        }
+    }
+}

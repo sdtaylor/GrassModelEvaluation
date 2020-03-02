@@ -1,0 +1,21 @@
+{
+    "model_name": "CholerM1A",
+    "parameters": {
+        "a1": 2.641399912672604,
+        "a2": 0.0016538630554023825,
+        "L": 7.757535986071,
+        "a3": 0
+    },
+    "metadata": {
+        "fitting_info": {
+            "method": "DE",
+            "optimize_output": {
+                "fun": 0.07654033086573545,
+                "nfev": 61800,
+                "nit": 102,
+                "message": "Optimization terminated successfully.",
+                "success": true
+            }
+        }
+    }
+}

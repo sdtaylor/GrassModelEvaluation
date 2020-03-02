@@ -1,0 +1,22 @@
+{
+    "model_name": "CholerM2B",
+    "parameters": {
+        "b1": 0.05351057796922731,
+        "b2": 71.9872510054982,
+        "b3": 61.66302132530138,
+        "b4": 3.8774366239408096,
+        "b5": 7.626522927154568
+    },
+    "metadata": {
+        "fitting_info": {
+            "method": "DE",
+            "optimize_output": {
+                "fun": 0.12012438831479821,
+                "nfev": 2000,
+                "nit": 1,
+                "message": "Optimization terminated successfully.",
+                "success": true
+            }
+        }
+    }
+}

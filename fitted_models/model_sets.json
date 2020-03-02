@@ -18,5 +18,207 @@
         "fit_datetime": "2020-02-06 10:50:55",
         "model_set_id": "ab20104adbc448f7",
         "note": "Fit using rmse as the loss function, and with the custom smoothed, though unscaled, ndvi"
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerMPR2",
+            "CholerMPR3"
+        ],
+        "model_filenames": [
+            "Naive-b212d5f452cc444f.json",
+            "CholerMPR2-b212d5f452cc444f.json",
+            "CholerMPR3-b212d5f452cc444f.json"
+        ],
+        "model_set_folder": "2020-02-07_b212d5f452cc444f/",
+        "fit_datetime": "2020-02-07 18:04:23",
+        "model_set_id": "b212d5f452cc444f",
+        "note": "first run of new modified choler models. still using custom smoothed (but not scaled) ndvi data."
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerMPR2",
+            "CholerMPR3",
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3"
+        ],
+        "model_filenames": [
+            "Naive-29c628cfe4c34719.json",
+            "CholerMPR2-29c628cfe4c34719.json",
+            "CholerMPR3-29c628cfe4c34719.json",
+            "CholerPR1-29c628cfe4c34719.json",
+            "CholerPR2-29c628cfe4c34719.json",
+            "CholerPR3-29c628cfe4c34719.json"
+        ],
+        "model_set_folder": "2020-02-08_29c628cfe4c34719/",
+        "fit_datetime": "2020-02-08 13:07:31",
+        "model_set_id": "29c628cfe4c34719",
+        "note": "fixing the lag at 2 (~30 days) to see what happens. still using custom smoothed (but not scaled) ndvi data."
+    },
+    {
+        "model_names": [
+            "CholerM1A",
+            "CholerM1B"
+        ],
+        "model_filenames": [
+            "CholerM1A-5a51b73dbe72442c.json",
+            "CholerM1B-5a51b73dbe72442c.json"
+        ],
+        "model_set_folder": "2020-02-10_5a51b73dbe72442c/",
+        "fit_datetime": "2020-02-10 18:00:44",
+        "model_set_id": "5a51b73dbe72442c",
+        "note": "fitting with only pixel_id==86, using choler2010 models. using custom smoothed and scaled ndvi."
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerMPR2",
+            "CholerMPR3",
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3",
+            "CholerM1A",
+            "CholerM1B",
+            "CholerM2A",
+            "CholerM2B"
+        ],
+        "model_filenames": [
+            "Naive-97684f11642e461f.json",
+            "CholerMPR2-97684f11642e461f.json",
+            "CholerMPR3-97684f11642e461f.json",
+            "CholerPR1-97684f11642e461f.json",
+            "CholerPR2-97684f11642e461f.json",
+            "CholerPR3-97684f11642e461f.json",
+            "CholerM1A-97684f11642e461f.json",
+            "CholerM1B-97684f11642e461f.json",
+            "CholerM2A-97684f11642e461f.json",
+            "CholerM2B-97684f11642e461f.json"
+        ],
+        "model_set_folder": "2020-02-11_97684f11642e461f/",
+        "fit_datetime": "2020-02-11 19:49:19",
+        "model_set_id": "97684f11642e461f",
+        "note": "fitting with only pixel_id==86, using all choler models. using custom smoothed and scaled ndvi."
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerM1A",
+            "CholerM1B",
+            "CholerM2A",
+            "CholerM2B",
+            "CholerMPR2",
+            "CholerMPR3",
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3"
+        ],
+        "model_filenames": [
+            "Naive-18a9fada0b0641a2.json",
+            "CholerM1A-18a9fada0b0641a2.json",
+            "CholerM1B-18a9fada0b0641a2.json",
+            "CholerM2A-18a9fada0b0641a2.json",
+            "CholerM2B-18a9fada0b0641a2.json",
+            "CholerMPR2-18a9fada0b0641a2.json",
+            "CholerMPR3-18a9fada0b0641a2.json",
+            "CholerPR1-18a9fada0b0641a2.json",
+            "CholerPR2-18a9fada0b0641a2.json",
+            "CholerPR3-18a9fada0b0641a2.json"
+        ],
+        "model_set_folder": "2020-02-12_18a9fada0b0641a2/",
+        "fit_datetime": "2020-02-12 13:08:14",
+        "model_set_id": "18a9fada0b0641a2",
+        "note": "using only the  WY subset, lag is estimated from 0-8.mean cvmae loss. with custom smoothed scaled ndvi data."
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerM1A",
+            "CholerM1B",
+            "CholerM2A",
+            "CholerM2B",
+            "CholerMPR2",
+            "CholerMPR3",
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3"
+        ],
+        "model_filenames": [
+            "Naive-030a701fbca74e2b.json",
+            "CholerM1A-030a701fbca74e2b.json",
+            "CholerM1B-030a701fbca74e2b.json",
+            "CholerM2A-030a701fbca74e2b.json",
+            "CholerM2B-030a701fbca74e2b.json",
+            "CholerMPR2-030a701fbca74e2b.json",
+            "CholerMPR3-030a701fbca74e2b.json",
+            "CholerPR1-030a701fbca74e2b.json",
+            "CholerPR2-030a701fbca74e2b.json",
+            "CholerPR3-030a701fbca74e2b.json"
+        ],
+        "model_set_folder": "2020-02-12_030a701fbca74e2b/",
+        "fit_datetime": "2020-02-12 15:15:41",
+        "model_set_id": "030a701fbca74e2b",
+        "note": "using only the  WY subset, lag is estimated from 0-8. mae loss. with custom smoothed scaled ndvi data."
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerM1A",
+            "CholerM1B",
+            "CholerM2A",
+            "CholerM2B",
+            "CholerMPR2",
+            "CholerMPR3",
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3"
+        ],
+        "model_filenames": [
+            "Naive-63d8cce901384b1a.json",
+            "CholerM1A-63d8cce901384b1a.json",
+            "CholerM1B-63d8cce901384b1a.json",
+            "CholerM2A-63d8cce901384b1a.json",
+            "CholerM2B-63d8cce901384b1a.json",
+            "CholerMPR2-63d8cce901384b1a.json",
+            "CholerMPR3-63d8cce901384b1a.json",
+            "CholerPR1-63d8cce901384b1a.json",
+            "CholerPR2-63d8cce901384b1a.json",
+            "CholerPR3-63d8cce901384b1a.json"
+        ],
+        "model_set_folder": "2020-02-12_63d8cce901384b1a/",
+        "fit_datetime": "2020-02-12 19:10:34",
+        "model_set_id": "63d8cce901384b1a",
+        "note": "using only the  WY subset, lag fixed to 2 for choler models. mean cvmae loss. with custom smoothed scaled ndvi data."
+    },
+    {
+        "model_names": [
+            "Naive",
+            "CholerM1A",
+            "CholerM1B",
+            "CholerM2A",
+            "CholerM2B",
+            "CholerMPR2",
+            "CholerMPR3",
+            "CholerPR1",
+            "CholerPR2",
+            "CholerPR3"
+        ],
+        "model_filenames": [
+            "Naive-5b15dc7907484a82.json",
+            "CholerM1A-5b15dc7907484a82.json",
+            "CholerM1B-5b15dc7907484a82.json",
+            "CholerM2A-5b15dc7907484a82.json",
+            "CholerM2B-5b15dc7907484a82.json",
+            "CholerMPR2-5b15dc7907484a82.json",
+            "CholerMPR3-5b15dc7907484a82.json",
+            "CholerPR1-5b15dc7907484a82.json",
+            "CholerPR2-5b15dc7907484a82.json",
+            "CholerPR3-5b15dc7907484a82.json"
+        ],
+        "model_set_folder": "2020-02-13_5b15dc7907484a82/",
+        "fit_datetime": "2020-02-13 06:56:02",
+        "model_set_id": "5b15dc7907484a82",
+        "note": "using only the  WY subset, lag fixed to 2 for choler models. mae loss. with custom smoothed scaled ndvi data."
     }
 ]

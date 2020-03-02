@@ -1,0 +1,21 @@
+{
+    "model_name": "CholerMPR2",
+    "parameters": {
+        "b2": 9.00129215661849e-05,
+        "b3": 0.16563993918787645,
+        "b4": 1.4710458842636598,
+        "L": 2
+    },
+    "metadata": {
+        "fitting_info": {
+            "method": "DE",
+            "optimize_output": {
+                "fun": 0.07979663268680667,
+                "nfev": 85800,
+                "nit": 142,
+                "message": "Optimization terminated successfully.",
+                "success": true
+            }
+        }
+    }
+}

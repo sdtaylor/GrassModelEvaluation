@@ -1,0 +1,8 @@
+md5: bc9755a2b5067d01641175595ca49a9e
+wdir: .
+outs:
+- md5: 6610c73f16bf2363ea1c30334d025c24
+  path: aus_grassland_class34.tif
+  cache: true
+  metric: false
+  persist: false

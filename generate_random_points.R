@@ -1,29 +1,34 @@
 library(MODISTools)
 library(rgdal)
 library(tidyverse)
-library(rnaturalearth)
 
 source('tools/tools.R')
 config = load_config()
 
+
 ###########################
-# Make a geojson of random points within the western USA 
+# Make a geojson of random points within AUS grasslands
 ###########################
+# This is a conversion of the original landcover raster to just class
+# 34 using QGIS
+aus_grassland = raster::raster('data/landcover/aus_grassland_class34.tif')
+
 set.seed(100)
 random_point_count = config$random_point_count
 percent_training = config$percent_training
 
-us_states = c('Washington','Oregon','California','Montana','Idaho','Nevada',
-              'Arizona','Wyoming','Colorado','Utah','New Mexico','Texas',
-              'Oklahoma','Nebraska','Kansas','South Dakota','North Dakota')
-ca_states = c('British Columbia','Alberta','Saskatchewan','Manitoba')
-mx_states = c('Baja California','Sonora','Chihuahua','Coahuila')
+all_grassland_points = which(raster::values(aus_grassland)==1)
+random_points = sample(all_grassland_points, size=400)
 
-western_na = rnaturalearth::ne_states(country = c('mexico','canada','united states of america'), returnclass = 'sp')
-#western_na = rnaturalearth::ne_states(country = 'united states of america', returnclass = 'sp')
-western_na = subset(western_na, name %in% c(ca_states, us_states, mx_states))
+random_point_locations <- as_tibble(raster::xyFromCell(aus_grassland, random_points))
+library(sf)
+samp_sf <- st_as_sf(random_point_locations, coords = c('x', 'y'), crs = 3577)
 
-random_points = sp::spsample(western_na, n=random_point_count, type='random')
+samp_sf = st_transform(samp_sf, crs=4326)
+
+st_write(samp_sf, dsn='data/aus_random_points.geojson', driver='GEOJson', delete_dsn=T)
+
+random_points = sp::spsample(aus_grassland, n=random_point_count, type='random')
 random_points = SpatialPointsDataFrame(random_points, data=data.frame(pixel_id = 1:length(random_points)))
 
 #sf::st_write(random_points, dsn='data/random_points.shp', driver='ESRI Shapefile', delete_dsn=T)

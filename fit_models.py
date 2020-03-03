@@ -66,7 +66,7 @@ def dask_scipy_mapper(func, iterable, c=dask_client):
 loss_function = 'mean_cvmae'
 
 de_fitting_params = {
-                     #'maxiter':500,
+                     #'maxiter':1000,
                      #'popsize':200,
                      'maxiter':3,
                      'popsize':20,
@@ -81,17 +81,37 @@ de_fitting_params = {
 parameter_ranges = {'CholerPR1':{'b1':(0,200),
                                  'b2':(0,10),
                                  'b3':(0,10),
-                                 'L' :(0,8)},
+                                 'L' : 2},
                     'CholerPR2':{'b1':(0,200),
                                  'b2':(0,10),
                                  'b3':(0,10),
                                  'b4':(0,200),
-                                 'L' :(0,8)},
+                                 'L' : 2},
                     'CholerPR3':{'b1':(0,200),
                                  'b2':(0,10),
                                  'b3':(0,10),
                                  'b4':(0,200),
-                                 'L' :(0,8)},
+                                 'L' : 2},
+                    'CholerMPR2':{'b2':(0,10),
+                                  'b3':(0,10),
+                                  'b4':(0,200),
+                                  'L' :2},
+                    'CholerMPR3':{'b2':(0,10),
+                                  'b3':(0,10),
+                                  'b4':(0,200),
+                                  'L' :2},
+                    'CholerM1A':{'L' :2},
+                    'CholerM1B':{'L' :2},
+                    'CholerM2A':{},
+                    'CholerM2B':{},
+                    'CholerMPR2':{'b2':(0,10),
+                                  'b3':(0.1,10),
+                                  'b4':(0,200),
+                                  'L' :2},
+                    'CholerMPR3':{'b2':(0,10),
+                                  'b3':(0.1,10),
+                                  'b4':(0,200),
+                                  'L' :2},
                     'PhenoGrassNDVI':{'b1': -1, # b1 is a not actually used in phenograss at the moment, 
                                                 # see https://github.com/sdtaylor/GrasslandModels/issues/2
                                                 # Setting to -1 makes it so the optimization doesn't waste time on b1
@@ -123,7 +143,8 @@ if __name__=='__main__':
     fit_models = []
     
     for training_years in training_year_sets[0:1]:
-        for model_name in ['Naive','CholerPR1','CholerPR2','CholerPR3','PhenoGrassNDVI']:
+        #for model_name in ['Naive','CholerPR1','CholerPR2','CholerPR3','PhenoGrassNDVI']:
+        for model_name in ['Naive','CholerMPR2','CholerMPR3','CholerPR1','CholerPR2','CholerPR3']:
             
             # This future is the model, with fitting data, being loaded on all
             # the nodes by replicate()
@@ -161,5 +182,5 @@ if __name__=='__main__':
     
     
     # compile all the models into a set and save
-    model_set = load_models.make_model_set(fit_models, note='test set in ceres')
+    model_set = load_models.make_model_set(fit_models, note='')
     load_models.save_model_set(model_set)
